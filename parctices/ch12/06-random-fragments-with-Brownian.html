@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Random Fragments</title>
+  <title>Random Fragments with Brownian</title>
   <style type="text/css">
   body {
     margin: 0;
@@ -57,15 +57,11 @@ window.onload = function() {
   canvas.height = window.innerHeight;
   const context = canvas.getContext('2d');
   const num = 100;
-  const v = 1;
   const polygons = new Array(num).fill(0).map(t => {
     const size = 20;
     const polygon = new Polygon(3, size);
     polygon.x = Math.random() * canvas.width;
     polygon.y = Math.random() * canvas.height;
-    polygon.vx = Math.random() * v - v / 2;
-    polygon.vy = Math.random() * v - v / 2;
-    polygon.w = Math.random() * 0.005;
     return polygon;
   });
 
@@ -108,6 +104,11 @@ window.onload = function() {
     polygon.draw(context);
   }
   function move(polygon) {
+    const v = 1;
+    polygon.vx = Math.random() * v - v / 2;
+    polygon.vy = Math.random() * v - v / 2;
+    polygon.w = Math.random() * 0.005;
+
     polygon.x += polygon.vx;
     polygon.y += polygon.vy;
     polygon.rotation += polygon.w;

@@ -7,6 +7,7 @@
   body {
     margin: 0;
     overflow: hidden;
+    background: #000;
   }
   </style>
 </head>
@@ -38,7 +39,7 @@ Polygon.prototype.draw = function(context) {
   context.save();
   context.translate(this.x, this.y);
   context.rotate(this.rotation);
-  context.fillStyle = this.color;
+  context.fillStyle = 'rgba(0, 0, 255, .5)';
   context.beginPath();
   context.moveTo(this.x0, this.y0);
   Array(this.count - 1).fill(0).forEach(function(d, i) {
@@ -60,7 +61,7 @@ window.onload = function() {
   const v = 1;
   const polygons = new Array(num).fill(0).map(t => {
     const size = 20;
-    const polygon = new Polygon(3, size);
+    const polygon = new Polygon(3, size, '#ffffff');
     polygon.x = Math.random() * canvas.width;
     polygon.y = Math.random() * canvas.height;
     polygon.vx = Math.random() * v - v / 2;
