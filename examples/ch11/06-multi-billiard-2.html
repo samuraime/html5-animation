@@ -63,6 +63,7 @@
                    (ball0.mass + ball1.mass);
           vel1.x = vxTotal + vel0.x;
           //update position - to avoid objects becoming stuck together
+          // @note 这个计算仅是近似的
           var absV = Math.abs(vel0.x) + Math.abs(vel1.x),
               overlap = (ball0.radius + ball1.radius) - Math.abs(pos0.x - pos1.x);
           pos0.x += vel0.x / absV * overlap;

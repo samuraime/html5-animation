@@ -25,7 +25,7 @@
       (function drawFrame () {
         window.requestAnimationFrame(drawFrame, canvas);
         context.clearRect(0, 0, canvas.width, canvas.height);
-
+        // @note easing 是通多dx|dy * easing计算出速度增量
         var vx = (targetX - ball.x) * easing,
             vy = (targetY - ball.y) * easing;
 

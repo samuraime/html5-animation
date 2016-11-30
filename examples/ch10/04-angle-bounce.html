@@ -43,6 +43,8 @@
         ball.x += ball.vx;
         ball.y += ball.vy;
         //get position of ball, relative to line
+        // @note 获取相对于line的坐标即将ball转置到水平面
+        // @note 水平面计算bounce时只需reverse y velocity
         var x1 = ball.x - line.x,
             y1 = ball.y - line.y,
             //rotate coordinates
@@ -52,11 +54,13 @@
             vx1 = cos * ball.vx + sin * ball.vy,
             vy1 = cos * ball.vy - sin * ball.vx;
         //perform bounce with rotated values
+        // @note 以上几步变换仅为了计算y velocity
         if (y2 > -ball.radius) {
           y2 = -ball.radius;
           vy1 *= bounce;
         }
-        //rotate everything back
+
+        //everything back
         x1 = cos * x2 - sin * y2;
         y1 = cos * y2 + sin * x2;
         ball.vx = cos * vx1 - sin * vy1;

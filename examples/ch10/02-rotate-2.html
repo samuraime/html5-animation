@@ -33,6 +33,8 @@
         
         var x1 = ball.x - centerX,
             y1 = ball.y - centerY,
+            // @note 和差化积展开什么的不会
+            // @note 就直接看矩阵的旋转变换好了
             x2 = cos * x1 - sin * y1,
             y2 = cos * y1 + sin * x1;
         

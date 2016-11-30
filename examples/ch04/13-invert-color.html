@@ -26,7 +26,7 @@
 
       var imagedata = context.getImageData(0, 0, canvas.width, canvas.height),
           pixels = imagedata.data;
-
+      console.log(imagedata);
       //pixel iteration
       for (var offset = 0, len = pixels.length; offset < len; offset += 4) {
         //invert each color component of the pixel: r,g,b,a (0-255)

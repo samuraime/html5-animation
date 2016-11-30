@@ -93,7 +93,7 @@
       (function drawFrame () {
         window.requestAnimationFrame(drawFrame, canvas);
         context.clearRect(0, 0, canvas.width, canvas.height);
-
+        // @note 一个对象同时向其余对象运动
         if (!ball0_dragging) {
           springTo(ball0, ball1);
           springTo(ball0, ball2);

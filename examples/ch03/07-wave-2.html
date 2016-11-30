@@ -34,7 +34,7 @@
         //Calculate the new position.
         xpos += xspeed;
         angle += yspeed;
-        ypos = centerY + Math.sin(angle) * range;
+        ypos = centerY + Math.sin(-angle) * range;
         context.lineTo(xpos, ypos);
         context.stroke();
       }());

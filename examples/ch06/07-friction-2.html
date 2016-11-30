@@ -28,7 +28,8 @@
       (function drawFrame () {
         window.requestAnimationFrame(drawFrame, canvas);
         context.clearRect(0, 0, canvas.width, canvas.height);
-
+        // @note a = friction / m
+        // @note 这里的friction为简化的加速度
         vx *= friction;
         vy *= friction;
         ball.x += vx;

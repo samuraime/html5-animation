@@ -38,6 +38,7 @@
             dy = ball1.y - ball0.y,
             dist = Math.sqrt(dx * dx + dy * dy);
         //collision handling code here
+        // @note 先把对象都转换到水平面, 计算完毕后变换回去
         if (dist < ball0.radius + ball1.radius) {
           //calculate angle, sine, and cosine
           var angle = Math.atan2(dy, dx),

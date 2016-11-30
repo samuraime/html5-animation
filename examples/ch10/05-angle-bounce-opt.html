@@ -49,6 +49,7 @@
             y2 = cos * y1 - sin * x1;
         
         //perform bounce with rotated values
+        // @note 仅在ball接触到line进行计算, 上个例子的优化
         if (y2 > -ball.radius) {
           //rotate coordinates
           var x2 = cos * x1 + sin * y1,

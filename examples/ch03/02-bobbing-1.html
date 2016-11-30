@@ -15,11 +15,10 @@
     <script src="./classes/ball.js"></script>
     <script>
     window.onload = function () {
-      var canvas = document.getElementById('canvas'),
-          context = canvas.getContext('2d'),
-          ball = new Ball(),
-          angle = 0;
-        
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+      const ball = new Ball();
+      let angle = 0;
       ball.x = canvas.width / 2;
       ball.y = canvas.height / 2;
         

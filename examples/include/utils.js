@@ -189,6 +189,7 @@ window.utils.containsPoint = function (rect, x, y) {
  * @return {boolean}
  */
 window.utils.intersects = function (rectA, rectB) {
+  // @note 左边width, height较大的rectangle起决定作用
   return !(rectA.x + rectA.width < rectB.x ||
            rectB.x + rectB.width < rectA.x ||
            rectA.y + rectA.height < rectB.y ||
