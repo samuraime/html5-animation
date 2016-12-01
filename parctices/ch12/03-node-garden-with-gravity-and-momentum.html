@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Gravity and Momentum</title>
+  <style type="text/css">
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  </style>
+</head>
+<body>
+<canvas></canvas>
+<script type="text/javascript">
+function Node(radius = 5, color = '#000000') {
+  this.radius = radius;
+  this.color = color;
+  this.mass = 1;
+  this.x = 0;
+  this.y = 0;
+  this.vx = 0;
+  this.vy = 0;
+  this.rotation = 0;
+  this.lineWidth = 1;
+}
+Node.prototype.draw = function(context) {
+  context.save();
+  context.translate(this.x, this.y);
+  context.rotate(this.rotation);
+  context.fillStyle = this.color;
+  context.beginPath();
+  context.arc(0, 0, this.radius, 0, 2 * Math.PI);
+  context.closePath();
+  context.fill();
+  if (this.lineWidth > 0) {
+    context.stroke();
+  }
+  context.restore();
+}
+function getDist(a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  const sq = dx * dx + dy * dy;
+  return Math.sqrt(sq);
+}
+window.onload = function() {
+  const canvas = document.querySelector('canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const context = canvas.getContext('2d');
+  const nodeNum = 20;
+  const v = 1;
+  const nodes = new Array(nodeNum).fill(0).map((d, i) => {
+    const radius = Math.random() * 20;
+    const node = new Node(radius);
+    node.mass = Math.PI * radius * radius * 0.2;
+    node.x = Math.random() * canvas.width;
+    node.y = Math.random() * canvas.height;
+    node.vx = Math.random() * v - v / 2;
+    node.vy = Math.random() * v - v / 2;
+    return node;
+  });
+  function draw(node) {
+    node.draw(context);
+  }
+  function checkWalls(node) {
+    const bounce = -0.6;
+    if (node.x + node.radius > canvas.width) {
+      node.vx *= bounce;
+      node.x = canvas.width - node.radius;
+    } else if (node.x - node.radius < 0) {
+      node.vx *= bounce;
+      node.x = node.radius;
+    }
+    if (node.y + node.radius > canvas.height) {
+      node.vy *= bounce;
+      node.y = canvas.height - node.radius;
+    } else if (node.y - node.radius < 0) {
+      node.vy *= bounce;
+      node.y = node.radius;
+    }
+  }
+  function rotate(x, y, sin, cos, reverse = false) {
+    const sine = (reverse ? -1 : 1) * sin;
+    return {
+      x: x * cos - y * sine,
+      y: y * cos + x * sine,
+    }
+  }
+  function checkCollision(a, b) {
+    // in a's viewpoint
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const sq = dx * dx + dy * dy;
+    if (Math.sqrt(sq) > a.radius + b.radius) return;
+    const angle = Math.atan2(dy, dx);
+    const sin = Math.sin(angle);
+    const cos = Math.cos(angle);
+    // in a's viewpoint, rotate to x axis
+    const posA = { x: 0, y: 0 };
+    const posB = rotate(dx, dy, sin, cos, true);
+    const velA = rotate(a.vx, a.vy, sin, cos, true);
+    const velB = rotate(b.vx, b.vy, sin, cos, true);
+    // in a's viewpoint, calc velocity
+    const vxTotal = velB.x - velA.x;
+    // momentum conservation
+    velA.x = ((a.mass - b.mass) * velA.x + 2 * b.mass * velB.x) / (a.mass + b.mass);
+    velB.x = velA.x - vxTotal;
+    posA.x += velA.x;
+    posB.x += velB.x;
+    // fix overlap
+    const absV = Math.abs(velA.x) + Math.abs(velB.x);
+    const overlap = (a.radius + b.radius) - Math.abs(posA.x - posB.x);
+    posA.x += velA.x / absV * overlap;
+    posB.x += velB.x / absV * overlap;
+    // rotate back
+    const posAF = rotate(posA.x, posA.y, sin, cos);
+    const posBF = rotate(posB.x, posB.y, sin, cos);
+    b.x = a.x + posBF.x;
+    b.y = a.y + posBF.y;
+    a.x += posAF.x;
+    a.y += posAF.y;
+    const velAF = rotate(velA.x, velA.y, sin, cos);
+    const velBF = rotate(velB.y, velB.y, sin, cos);
+    a.vx = velAF.x;
+    a.vy = velAF.y;
+    b.vx = velBF.x;
+    b.vy = velBF.y;
+  }
+  function gravitate(a, b) {
+    // 吸附到一起后则不计算引力, 避免引力飙升, 产生诡异的速度
+    // 虽然没有完全解决
+    if (getDist(a, b) < a.radius + b.radius) return;
+    // F = G * m * M / r^2
+    const g = 0.01;
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const sq = dx * dx + dy * dy;
+    const dist = Math.sqrt(sq);
+    const force = g * a.mass * b.mass / sq;
+    const fx = force * dx / dist;
+    const fy = force * dy / dist;
+    a.vx -= fx / a.mass;
+    a.vy -= fy / a.mass;
+    b.vx += fx / b.mass;
+    b.vy += fy / b.mass;
+  }
+  function move(node) {
+    node.x += node.vx;
+    node.y += node.vy;
+    checkWalls(node);
+  }
+  (function drawFrame() {
+    window.requestAnimationFrame(drawFrame);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    nodes.forEach(move);
+    nodes.forEach((node, index) => {
+      nodes.forEach((n, i) => {
+        if (i > index) {
+          checkCollision(node, n);
+          gravitate(node, n);
+        }
+      });
+    });
+    nodes.forEach(draw);
+  })();
+}
+</script>
+</body>
+</html>

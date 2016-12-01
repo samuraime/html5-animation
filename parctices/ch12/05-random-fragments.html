@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Random Fragments</title>
+  <style type="text/css">
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  </style>
+</head>
+<body>
+<canvas></canvas>
+<script type="text/javascript">
+function Polygon(count, size = 30, color = '#000000') {
+  this.count = count;
+  this.size = size;
+  this.color = color;
+  this.x = 0;
+  this.y = 0;
+  this.vx = 0;
+  this.vy = 0;
+  this.rotation = 0;
+  this.lineWidth = 1;
+  Array(count).fill(0).forEach(function(d, i) {
+    const angle = Math.random() * Math.PI;
+    this[`x${i}`] = size * Math.cos(angle);
+    this[`y${i}`] = size * Math.sin(angle);
+  }.bind(this));
+}
+Polygon.prototype.draw = function(context) {
+  context.save();
+  context.translate(this.x, this.y);
+  context.rotate(this.rotation);
+  context.fillStyle = this.color;
+  context.beginPath();
+  context.moveTo(this.x0, this.y0);
+  Array(this.count - 1).fill(0).forEach(function(d, i) {
+    context.lineTo(this[`x${i + 1}`], this[`y${i + 1}`]);
+  }.bind(this));
+  context.closePath();
+  context.fill();
+  if (this.lineWidth > 0) {
+    context.stroke();
+  }
+  context.restore();
+}
+window.onload = function() {
+  const canvas = document.querySelector('canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const context = canvas.getContext('2d');
+  const num = 20;
+  const polygons = new Array(num).fill(0).map(t => {
+    const size = 10 + Math.random() * 30;
+    const polygon = new Polygon(3, size);
+    polygon.x = canvas.width * Math.random();
+    polygon.y = canvas.height * Math.random();
+    console.log(polygon);
+    return polygon;
+  });
+  function draw(node) {
+    node.draw(context);
+  }
+  function move(t) {
+    t.x += t.vx;
+    t.y += t.vy;
+  }
+  (function drawFrame() {
+    window.requestAnimationFrame(drawFrame);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    polygons.forEach(move);
+    polygons.forEach(draw);
+  })();
+}
+</script>
+</body>
+</html>

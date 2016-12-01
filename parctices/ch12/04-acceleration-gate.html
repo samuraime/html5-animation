@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Acceleration Gate</title>
+  <style type="text/css">
+  body {
+    margin: 0;
+    overflow: hidden;
+  }
+  </style>
+</head>
+<body>
+<canvas></canvas>
+<script type="text/javascript">
+function Node(radius = 5, color = '#000000') {
+  this.radius = radius;
+  this.color = color;
+  this.mass = 1;
+  this.x = 0;
+  this.y = 0;
+  this.vx = 0;
+  this.vy = 0;
+  this.rotation = 0;
+  this.lineWidth = 1;
+}
+Node.prototype.draw = function(context) {
+  context.save();
+  context.translate(this.x, this.y);
+  context.rotate(this.rotation);
+  context.fillStyle = this.color;
+  context.beginPath();
+  context.arc(0, 0, this.radius, 0, 2 * Math.PI);
+  context.closePath();
+  context.fill();
+  if (this.lineWidth > 0) {
+    context.stroke();
+  }
+  context.restore();
+}
+window.onload = function() {
+  const canvas = document.querySelector('canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const context = canvas.getContext('2d');
+  const gate0 = new Node(10, '#0000ff');
+  const gate1 = new Node(10, '#0000ff');
+  const ball = new Node(5);
+  gate0.x = canvas.width / 2;
+  gate0.y = canvas.height / 2 - 100;
+  gate0.mass = 10;
+  gate1.x = canvas.width / 2;
+  gate1.y = canvas.height / 2 + 100;
+  gate1.mass = 10;
+  ball.y = canvas.height / 2;
+  ball.mass = 5;
+  function draw(node) {
+    node.draw(context);
+  }
+  function gravitate(ball, gate) {
+    // F = G * m * M / r^2
+    const dx = ball.x - gate.x;
+    const dy = ball.y - gate.y;
+    const distSQ = dx * dx + dy * dy;
+    const dist = Math.sqrt(distSQ);
+    const force = ball.mass * gate.mass / distSQ * 20;
+    const fx = force * dx / dist;
+    ball.vx -= fx / ball.mass;
+  }
+  function move(node) {
+    node.x += node.vx;
+    node.y += node.vy;
+    
+    gravitate(node, gate0);
+    gravitate(node, gate1);
+  }
+  (function drawFrame() {
+    window.requestAnimationFrame(drawFrame);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    move(ball);
+    [ball, gate0, gate1].forEach(draw);
+  })();
+}
+</script>
+</body>
+</html>

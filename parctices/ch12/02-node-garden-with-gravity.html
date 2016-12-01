@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Gravity Random</title>
+  <style type="text/css">
+  body {
+    margin: 0;
+  }
+  </style>
+</head>
+<body>
+<canvas></canvas>
+<script type="text/javascript">
+function Node(radius = 5, color = '#000000') {
+  this.radius = radius;
+  this.color = color;
+  this.mass = 1;
+  this.x = 0;
+  this.y = 0;
+  this.vx = 0;
+  this.vy = 0;
+  this.rotation = 0;
+  this.lineWidth = 1;
+}
+Node.prototype.draw = function(context) {
+  context.save();
+  context.translate(this.x, this.y);
+  context.rotate(this.rotation);
+  context.fillStyle = this.color;
+  context.beginPath();
+  context.arc(0, 0, this.radius, 0, 2 * Math.PI);
+  context.closePath();
+  context.fill();
+  if (this.lineWidth > 0) {
+    context.stroke();
+  }
+  context.restore();
+}
+window.onload = function() {
+  const canvas = document.querySelector('canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const context = canvas.getContext('2d');
+  const nodeNum = 20;
+  const v = 0;
+  const nodes = new Array(nodeNum).fill(0).map((d, i) => {
+    const radius = Math.random() * 20;
+    const node = new Node(radius);
+    node.mass = Math.PI * radius * radius * 0.1;
+    node.x = Math.random() * canvas.width;
+    node.y = Math.random() * canvas.height;
+    node.vx = Math.random() * v - v / 2;
+    node.vy = Math.random() * v - v / 2;
+    return node;
+  });
+  function draw(node) {
+    node.draw(context);
+  }
+  function gravitate(a, b) {
+    // F = G * m * M / r^2
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const distSQ = dx * dx + dy * dy;
+    const dist = Math.sqrt(distSQ);
+    const force = a.mass * b.mass / distSQ * 1;
+    const fx = force * dx / dist;
+    const fy = force * dy / dist;
+    a.vx -= fx / a.mass;
+    a.vy -= fy / a.mass;
+    b.vx += fx / b.mass;
+    b.vy += fy / b.mass;
+  }
+  function move(node, index) {
+    node.x += node.vx;
+    node.y += node.vy;
+    
+    // 计算每个node下一帧的速度
+    nodes.forEach((n, i) => {
+      if (i > index) {
+        gravitate(node, n);
+      }
+    });
+  }
+  (function drawFrame() {
+    window.requestAnimationFrame(drawFrame);
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    nodes.forEach(move);
+    nodes.forEach(draw);
+  })();
+}
+</script>
+</body>
+</html>

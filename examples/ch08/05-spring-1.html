@@ -29,6 +29,7 @@
         context.clearRect(0, 0, canvas.width, canvas.height);
         // @note 弹簧
         // @note spring 是通过dx|dy * spring计算出加速度增量
+        // @note 即胡克定律
         var dx = targetX - ball.x,
             ax = dx * spring;
 
